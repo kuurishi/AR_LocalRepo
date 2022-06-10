@@ -9,10 +9,16 @@ public class Cube : MonoBehaviour
     public GameObjectType type;
     public string title;
 
+
     //private Variables
     private Settings _settings;
     private Renderer _renderer;
     private int _lifePoints;
+
+
+    private bool _materialChanged = false;
+
+
 
     // Start is called before the first frame update
     //MonoBehaviour Events
@@ -39,11 +45,14 @@ public class Cube : MonoBehaviour
         }
     }
 
+
+
     //Public Methods
     public void AddLifePoints(int points)
     {
         _lifePoints += points;
     }
+
 
 
     //private Methods
@@ -61,6 +70,10 @@ public class Cube : MonoBehaviour
         }
     }
 
+
+
+
+
     private Material MaterialFor(GameObjectType _type)
     {
         if (_type == GameObjectType.Player)
@@ -71,13 +84,39 @@ public class Cube : MonoBehaviour
         {
             return _settings.enemyMaterial;
         }
+
+
         Debug.LogWarning("Cube.LifePoints: _type is unknown");
         return _settings.errorMaterial;
+    
     }
 
-    // Update is called once per frame
-    void Update()
+    
+
+
+
+    public void SwitchMaterial()
     {
+        
+        _renderer.material = _settings.tappedMaterial;
+
+
+        if (!_materialChanged)
+        {
+            _renderer.material = _settings.tappedMaterial;
+            _materialChanged = true;
+
+        }
+        else
+        {
+            _renderer.material = MaterialFor(type);
+            _materialChanged = false;
+        }
+
 
     }
+
+
+
+
 }

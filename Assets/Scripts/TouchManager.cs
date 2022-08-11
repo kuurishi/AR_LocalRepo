@@ -26,7 +26,7 @@ public class TouchManager : MonoBehaviour
 
         Debug.Log("tapped with finger" + _finger.Index + "at" + _finger.ScreenPosition);
         
-        gameManager.OnTap(_finger);
+        //gameManager.OnTap(_finger);
 
     }
 

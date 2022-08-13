@@ -10,6 +10,8 @@ using SimpleJSON; // Source: https://github.com/Bunny83/SimpleJSON/blob/master/S
 
 public class WebSocketsConnection : MonoBehaviour
 {
+
+
   private WebSocket webSocket;
   private string serverUrl = "ws://arapp.uber.space:43540/nodejs-server";
   private int serverErrorCode;
@@ -21,12 +23,14 @@ public class WebSocketsConnection : MonoBehaviour
 
   void Start()
   {
+    //subscribes to the OnEvents, but doesn't connect yet. the connection opens 
     webSocket = new WebSocket(serverUrl);
 
     webSocket.OnOpen += OnOpen;
     webSocket.OnMessage += OnMessage;
     webSocket.OnClose += OnClose;
     webSocket.OnError += OnError;
+
   }
 
   void Update()
@@ -41,21 +45,31 @@ public class WebSocketsConnection : MonoBehaviour
   // WebSockets Event Handlers
   //////////////////////////////////
 
-  private void OnOpen() {
+  private void OnOpen() 
+  {
     print("Connection opened");
     GameManager.Instance.OnServerConnectionOpened();
   }
 
-  private void OnMessage(byte[] inboundBytes) {
+
+  //the players will receive a message if for example another player joined
+  private void OnMessage(byte[] inboundBytes) 
+  { 
+
     print("Message received");
     string inboundString = System.Text.Encoding.UTF8.GetString(inboundBytes);
     
-    if (int.TryParse(inboundString, out serverErrorCode)) {
+    //checks if its a string or just an integer number. if it is just an integer, then its an error from the server (errors not implemented here. as soon as you have an error, use a diff number for diff errors. send this error code back when it occurs.)
+    if (int.TryParse(inboundString, out serverErrorCode)) 
+    {
       // If server returns an integer, it is an error
       print($"Server Error: {serverErrorCode}");
-    } else {
+    } 
+    else 
+    {
       JSONNode json = JSON.Parse(inboundString);
       
+      //a switch statement would be nice here
       if (json["packageType"].Value == "PlayerJoinedPackage") {
           // Received PlayerJoinedPackage
           PlayerJoinedPackage playerJoinedPackage = JsonUtility.FromJson<PlayerJoinedPackage>(inboundString);
@@ -77,32 +91,46 @@ public class WebSocketsConnection : MonoBehaviour
           PlayerShotPackage playerShotPackage = JsonUtility.FromJson<PlayerShotPackage>(inboundString);
           GameManager.Instance.DidReceivePlayerShotPackage(playerShotPackage);
       }
+
     }
+
+
   }
 
-  private void OnClose(WebSocketCloseCode closeCode) {
+
+  private void OnClose(WebSocketCloseCode closeCode) 
+  {
     print($"Connection closed: {closeCode}");
     GameManager.Instance.OnServerConnectionClosed();
   }
 
-  private void OnError(string errorMessage) {
+
+  private void OnError(string errorMessage) 
+  {
     print($"Connection error: {errorMessage}");
   }
+
 
 
   //////////////////////////////////
   // Public Methods
   //////////////////////////////////
 
-  public async void ConnectToServer() {
-    await webSocket.Connect();
+  public async void ConnectToServer() 
+  {
+    await webSocket.Connect(); //made a request to connect to the server and we're waiting for a response. the response is at private void OnOpen()
   }
 
-  public async void DisconnectFromServer() {
+
+  public async void DisconnectFromServer() 
+  {
     await webSocket.Close();
   }
 
-  public async void SendPlayerJoinedPackage(Player player) {
+
+  public async void SendPlayerJoinedPackage(Player player) 
+  {
+
     PlayerJoinedPackage package = new PlayerJoinedPackage(player);
 
     if (webSocket.State == WebSocketState.Open) {
@@ -110,9 +138,13 @@ public class WebSocketsConnection : MonoBehaviour
         byte[] bytes = Encoding.UTF8.GetBytes(json);
         await webSocket.Send(bytes);
     }
+
   }
 
-  public async void SendPlayerMovedPackage(Player player) {
+
+  public async void SendPlayerMovedPackage(Player player) 
+  {
+
     PlayerMovedPackage package = new PlayerMovedPackage(player);
 
     if (webSocket.State == WebSocketState.Open) {
@@ -120,9 +152,12 @@ public class WebSocketsConnection : MonoBehaviour
         byte[] bytes = Encoding.UTF8.GetBytes(json);
         await webSocket.Send(bytes);
     }
+
   }
 
-  public async void SendPlayerShotPackage(Player player) {
+  public async void SendPlayerShotPackage(Player player) 
+  {
+
     PlayerShotPackage package = new PlayerShotPackage(player);
 
     if (webSocket.State == WebSocketState.Open) {
@@ -130,9 +165,12 @@ public class WebSocketsConnection : MonoBehaviour
         byte[] bytes = Encoding.UTF8.GetBytes(json);
         await webSocket.Send(bytes);
     }
+
   }
 
-  public async void SendGameUpdatePackage(Game game) {
+  public async void SendGameUpdatePackage(Game game) 
+  {
+
     GameUpdatePackage package = new GameUpdatePackage(game);
 
     if (webSocket.State == WebSocketState.Open) {
@@ -140,5 +178,10 @@ public class WebSocketsConnection : MonoBehaviour
         byte[] bytes = Encoding.UTF8.GetBytes(json);
         await webSocket.Send(bytes);
     }
+
   }
+
+
+
+
 }

@@ -36,7 +36,7 @@ public class WebSocketsConnection : MonoBehaviour
   void Update()
   {
     #if !UNITY_WEBGL || UNITY_EDITOR
-      webSocket.DispatchMessageQueue();
+      webSocket.DispatchMessageQueue(); //////////////////////////////////////////???????????
     #endif
   }
 
@@ -77,7 +77,7 @@ public class WebSocketsConnection : MonoBehaviour
       } else if (json["packageType"].Value == "GameUpdatePackage") {
           // Received GameUpdatePackage
           GameUpdatePackage gameUpdatePackage = JsonUtility.FromJson<GameUpdatePackage>(inboundString);
-          GameManager.Instance.DidReceiveGameUpdatePackage(gameUpdatePackage);
+          GameManager.Instance.DidReceiveGameUpdatePackage(gameUpdatePackage); ////////////////////////////////////////????????
       } else if (json["packageType"].Value == "PlayerLeftPackage") {
           // Received PlayerLeftPackage
           PlayerLeftPackage playerLeftPackage = JsonUtility.FromJson<PlayerLeftPackage>(inboundString);

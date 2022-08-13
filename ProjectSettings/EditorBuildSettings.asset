@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/savedscenes/homeworkscene1.unity
     guid: b0c9b2e93a1af724eabd372163fe5299
+  - enabled: 1
+    path: Assets/Scenes/WebSocketScene.unity
+    guid: b2d39e3086896a34cba592562347004b
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6b59778fd04bf854aa499d18e2674187,
       type: 2}

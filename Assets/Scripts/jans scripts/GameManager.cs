@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 
         // Create a Player
         int playerId = Random.Range(0, 1000000); //assigns a random number, can happen that 2 users can have the same number, but chances are very low. still a stupid way to create an unique ID, but works for now
-        Vector3 playerPosition = Vector3.zero; // 0, 0, 0 for now.
+        Vector3 playerPosition = new Vector3(Random.Range(0,100),0,0); // 0, 0, 0 for now.
         _player = new Player(playerId, playerPosition.x, playerPosition.y, playerPosition.z);
 
         // Create a Game
@@ -150,7 +150,7 @@ public class GameManager : MonoBehaviour
         // Remove players that have left and their gameObjects from the game
         foreach(Player missingPlayer in missingPlayers) 
         {
-            Destroy(_playerGameObjects[missingPlayer.id]);
+            Destroy(_playerGameObjects[missingPlayer.id]); ////////////////////////////////////////////////?????
             _playerGameObjects.Remove(missingPlayer.id);
             _game.players.RemoveAll(p => p.id == missingPlayer.id);
         }
@@ -194,7 +194,7 @@ public class GameManager : MonoBehaviour
 
     public void DidReceiveGameUpdatePackage(GameUpdatePackage package) 
     {
-        UpdateGame(package.game);
+        UpdateGame(package.game); //////////////////////////////////////////??????????????????
     }
 
 

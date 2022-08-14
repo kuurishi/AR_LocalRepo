@@ -13,4 +13,5 @@ public class PlayerMovedPackage
     public PlayerMovedPackage(Player player) {
         this.player = player;
     }
+
 }

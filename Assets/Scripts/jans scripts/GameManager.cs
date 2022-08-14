@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
         int playerId = Random.Range(0, 1000000); //assigns a random number, can happen that 2 users can have the same number, but chances are very low. still a stupid way to create an unique ID, but works for now
         Vector3 playerPosition = new Vector3(Random.Range(0,100),0,0); // 0, 0, 0 for now.
         _player = new Player(playerId, playerPosition.x, playerPosition.y, playerPosition.z);
+        Debug.Log("player created: " + _player.id);
 
         // Create a Game
         _game = new Game(); //empty game 
@@ -144,6 +145,8 @@ public class GameManager : MonoBehaviour
             GameObject newPlayerGameObject = Instantiate(playerPrefab, newPlayer.position, Quaternion.identity);
             _playerGameObjects.Add(newPlayer.id, newPlayerGameObject);
             _game.players.Add(newPlayer);
+
+            Debug.Log("new player joined: " + newPlayer.id);
         }
 
 

@@ -5,8 +5,6 @@ using UnityEngine;
 public class MoveCube : MonoBehaviour
 {
 
-
-    // Update is called once per frame
     void Update()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
@@ -19,4 +17,5 @@ public class MoveCube : MonoBehaviour
         if (Input.GetKey(KeyCode.S))
             rb.AddForce(Vector3.down);
     }
+
 }

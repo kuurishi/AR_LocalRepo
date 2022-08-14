@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     private Player _player; //who owns the device
     private Game _game; //current game, all the game data
-    private Dictionary<int, GameObject> _playerGameObjects = new Dictionary<int, GameObject>(); 
+    //private Dictionary<int, GameObject> _playerGameObjects = new Dictionary<int, GameObject>();  //52, 82
 
 
 
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
 
 
         // Store GameObject reference in dictionary
-        _playerGameObjects.Add(_player.id, playerGameObject); //if we dont comment this line out, the 1st player disappears.
+            //_playerGameObjects.Add(_player.id, playerGameObject); //if we dont comment this line out, the 1st player disappears.
 
 
         _game.players.Add(_player); //1 player added to the list of players //put back in createagame
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
     {
         // Update the player's position based on input
         _player.position = newPosition;
-        _playerGameObjects[_player.id].transform.position = newPosition;
+            //_playerGameObjects[_player.id].transform.position = newPosition;
 
         // Send a PlayerMovedPackage
         webSockets.SendPlayerMovedPackage(_player);
@@ -108,6 +108,7 @@ public class GameManager : MonoBehaviour
         List<Player> newPlayers = new List<Player>();
         List<Player> missingPlayers = new List<Player>();
 
+        /*
         // Check for new players and add them to the newPlayers list
         foreach(Player p in game.players) 
         {
@@ -126,9 +127,8 @@ public class GameManager : MonoBehaviour
 
         }
 
-
         // Check for missing players and add them to the missingPlayers list
-        foreach(Player pl in _game.players) 
+        foreach (Player pl in _game.players) 
         {
             bool isStillInGame = false;
             foreach(Player p in game.players) 
@@ -145,13 +145,55 @@ public class GameManager : MonoBehaviour
 
         }
 
+        */
+
+        //swapped
+        foreach (Player p in _game.players)
+        {
+            bool isAlreadyInGame = false;
+            foreach (Player pl in game.players)
+            {
+                if (p.id == pl.id)
+                {
+                    isAlreadyInGame = true;
+                }
+            }
+            if (!isAlreadyInGame)
+            {
+                newPlayers.Add(p);
+            }
+
+        }
+
+        // Check for missing players and add them to the missingPlayers list
+        foreach (Player pl in game.players)
+        {
+            bool isStillInGame = false;
+            foreach (Player p in _game.players)
+            {
+                if (pl.id == p.id)
+                {
+                    isStillInGame = true;
+                }
+            }
+            if (!isStillInGame)
+            {
+                missingPlayers.Add(pl);
+            }
+
+        }
+
+
 
         // Then create a GameObject for new player & update the playerGameObjects dictionary & _game Game accordingly 
-        foreach(Player newPlayer in newPlayers) 
+        foreach (Player newPlayer in newPlayers) 
         {
             GameObject newPlayerGameObject = Instantiate(playerPrefab, newPlayer.position, Quaternion.identity);
-            _playerGameObjects.Add(newPlayer.id, newPlayerGameObject);
+                //_playerGameObjects.Add(newPlayer.id, newPlayerGameObject);
             //_game.players.Add(newPlayer); //already being added at around 211 didreceivedjoinpackage
+
+            //resend your own player data to the newly joined players (resend only if its a new player, else infinite messages)
+            webSockets.SendPlayerJoinedPackage(_player);
 
             Debug.Log("new player joined: " + newPlayer.id);
         }
@@ -160,8 +202,8 @@ public class GameManager : MonoBehaviour
         // Remove players that have left and their gameObjects from the game
         foreach(Player missingPlayer in missingPlayers) 
         {
-            Destroy(_playerGameObjects[missingPlayer.id]); ////////////////////////////////////////////////?????
-            _playerGameObjects.Remove(missingPlayer.id);
+                //Destroy(_playerGameObjects[missingPlayer.id]); ////////////////////////////////////////////////?????
+                //_playerGameObjects.Remove(missingPlayer.id);
             _game.players.RemoveAll(p => p.id == missingPlayer.id);
         }
 
@@ -172,14 +214,14 @@ public class GameManager : MonoBehaviour
     private void UpdatePlayerPosition(Player player) 
     {
         // Update player's position
-        _playerGameObjects[player.id].transform.position = player.position;
+            //_playerGameObjects[player.id].transform.position = player.position;
     }
 
 
     private void TriggerPlayerShot(Player player) 
     {
         // Trigger a shot for this specific player
-        _playerGameObjects[player.id].GetComponent<Gun>().Shoot();
+            //_playerGameObjects[player.id].GetComponent<Gun>().Shoot();
     }
 
 
@@ -210,6 +252,8 @@ public class GameManager : MonoBehaviour
 
     public void DidReceivePlayerJoinedPackage(PlayerJoinedPackage package) 
     {
+        Game oldGameState = _game; //save current state
+
         // Add player to Game _game
         _game.players.Add(package.player);
 
@@ -217,10 +261,11 @@ public class GameManager : MonoBehaviour
         //_game.players.Add(...);
 
         // Send out a GameUpdate package with updated _game
-        webSockets.SendGameUpdatePackage(_game);
+        //webSockets.SendGameUpdatePackage(_game);
 
-        //resend your own player data to the newly joined players
-        webSockets.SendPlayerJoinedPackage(_player);
+        //compare old and new state
+        UpdateGame(oldGameState);
+        
     }
 
 

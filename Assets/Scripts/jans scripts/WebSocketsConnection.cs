@@ -61,6 +61,8 @@ public class WebSocketsConnection : MonoBehaviour
     print("Message received"); //too vague
     string inboundString = System.Text.Encoding.UTF8.GetString(inboundBytes);
     
+        Debug.Log($"<color=#5EE8A5>Incoming message: {inboundString}</color>");
+    
     //checks if its a string or just an integer number. if it is just an integer, then its an error from the server (errors not implemented here. as soon as you have an error, use a diff number for diff errors. send this error code back when it occurs.)
     if (int.TryParse(inboundString, out serverErrorCode)) 
     {

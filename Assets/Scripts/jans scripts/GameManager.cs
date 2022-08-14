@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
         GameObject playerGameObject = Instantiate(playerPrefab, _player.position, Quaternion.identity);
 
         // Store GameObject reference in dictionary
-        _playerGameObjects.Add(_player.id, playerGameObject);
+        //_playerGameObjects.Add(_player.id, playerGameObject);
 
         // Establish server connection
         webSockets.ConnectToServer(); //from the websocketsconnection script

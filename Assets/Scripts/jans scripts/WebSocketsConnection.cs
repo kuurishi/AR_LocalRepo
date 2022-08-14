@@ -126,9 +126,11 @@ public class WebSocketsConnection : MonoBehaviour
   }
 
 
-  public async void DisconnectFromServer() 
+  public async void DisconnectFromServer(Player player) 
   {
-    await webSocket.Close();
+        SendPlayerLeftPackage(player);
+        await webSocket.Close();
+
   }
 
 
@@ -172,18 +174,33 @@ public class WebSocketsConnection : MonoBehaviour
 
   }
 
-  public async void SendGameUpdatePackage(Game game) 
-  {
+    public async void SendPlayerLeftPackage(Player player)
+    {
 
-    GameUpdatePackage package = new GameUpdatePackage(game);
+        PlayerLeftPackage package = new PlayerLeftPackage(player);
 
-    if (webSocket.State == WebSocketState.Open) {
-        string json = JsonUtility.ToJson(package);
-        byte[] bytes = Encoding.UTF8.GetBytes(json);
-        await webSocket.Send(bytes);
+        if (webSocket.State == WebSocketState.Open)
+        {
+            string json = JsonUtility.ToJson(package);
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            await webSocket.Send(bytes);
+        }
+
     }
 
-  }
+    public async void SendGameUpdatePackage(Game game) 
+    {
+
+        GameUpdatePackage package = new GameUpdatePackage(game);
+
+        if (webSocket.State == WebSocketState.Open) 
+        {
+            string json = JsonUtility.ToJson(package);
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            await webSocket.Send(bytes);
+        }
+
+    }
 
 
 

@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     private Player _player; //who owns the device
     private Game _game; //current game, all the game data
-    //private Dictionary<int, GameObject> _playerGameObjects = new Dictionary<int, GameObject>();  //52, 82
+    private Dictionary<int, GameObject> _playerGameObjects = new Dictionary<int, GameObject>();  //52, 82
 
 
 
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
 
 
         // Store GameObject reference in dictionary
-            //_playerGameObjects.Add(_player.id, playerGameObject); //if we dont comment this line out, the 1st player disappears.
+        _playerGameObjects.Add(_player.id, playerGameObject); //if we dont comment this line out, the 1st player disappears.
             
 
         _game.players.Add(_player); //1 player added to the list of players //put back in createagame
@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
 
     void OnApplicationQuit() 
     {
-        webSockets.DisconnectFromServer();
+        webSockets.DisconnectFromServer(_player);
     }
 
 
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
     {
         // Update the player's position based on input
         _player.position = newPosition;
-            //_playerGameObjects[_player.id].transform.position = newPosition;
+        _playerGameObjects[_player.id].transform.position = newPosition;
 
         // Send a PlayerMovedPackage
         webSockets.SendPlayerMovedPackage(_player);
@@ -189,7 +189,7 @@ public class GameManager : MonoBehaviour
         foreach (Player newPlayer in newPlayers) 
         {
             GameObject newPlayerGameObject = Instantiate(playerPrefab, newPlayer.position, Quaternion.identity);
-                //_playerGameObjects.Add(newPlayer.id, newPlayerGameObject);
+            _playerGameObjects.Add(newPlayer.id, newPlayerGameObject);
             //_game.players.Add(newPlayer); //already being added at around 211 didreceivedjoinpackage
 
             //resend your own player data to the newly joined players (resend only if its a new player, else infinite messages)
@@ -202,8 +202,8 @@ public class GameManager : MonoBehaviour
         // Remove players that have left and their gameObjects from the game
         foreach(Player missingPlayer in missingPlayers) 
         {
-                //Destroy(_playerGameObjects[missingPlayer.id]); ////////////////////////////////////////////////?????
-                //_playerGameObjects.Remove(missingPlayer.id);
+            Destroy(_playerGameObjects[missingPlayer.id]); ////////////////////////////////////////////////?????
+            _playerGameObjects.Remove(missingPlayer.id);
             _game.players.RemoveAll(p => p.id == missingPlayer.id);
         }
 
@@ -214,14 +214,14 @@ public class GameManager : MonoBehaviour
     private void UpdatePlayerPosition(Player player) 
     {
         // Update player's position
-            //_playerGameObjects[player.id].transform.position = player.position;
+        _playerGameObjects[player.id].transform.position = player.position;
     }
 
 
     private void TriggerPlayerShot(Player player) 
     {
         // Trigger a shot for this specific player
-            //_playerGameObjects[player.id].GetComponent<Gun>().Shoot();
+        _playerGameObjects[player.id].GetComponent<Gun>().Shoot();
     }
 
 
@@ -276,7 +276,7 @@ public class GameManager : MonoBehaviour
             {
                 return;
             }
-            
+
         }
 
         // if it does, Add player to playerlist
@@ -284,17 +284,39 @@ public class GameManager : MonoBehaviour
 
         //if it does, instantiate 
         GameObject newPlayerGameObject = Instantiate(playerPrefab, package.player.position, Quaternion.identity);
+        //add the game object to the list
+        _playerGameObjects.Add(package.player.id, newPlayerGameObject);
+
+
+        //resending to all other clients
+        webSockets.SendPlayerJoinedPackage(_player);
 
     }
 
 
     public void DidReceivePlayerLeftPackage(PlayerLeftPackage package) 
     {
+        int playerID = package.player.id;
+
+        //find the object that needs to be deleted and delete and remove it from the dictionary
+        foreach (var entry in _playerGameObjects)
+        {
+            if(entry.Key == playerID)
+            {
+                Destroy(entry.Value);
+                _playerGameObjects.Remove(playerID);
+            }
+
+
+        }        
+        
         // Remove player from Game _game
         _game.players.RemoveAll(player => player.id == package.player.id);
         
         // Send out a GameUpdate package with updated _game
-        webSockets.SendGameUpdatePackage(_game);
+        //webSockets.SendGameUpdatePackage(_game);
+
+
     }
 
 

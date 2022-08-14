@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
 
         // Store GameObject reference in dictionary
             //_playerGameObjects.Add(_player.id, playerGameObject); //if we dont comment this line out, the 1st player disappears.
-
+            
 
         _game.players.Add(_player); //1 player added to the list of players //put back in createagame
 
@@ -252,10 +252,10 @@ public class GameManager : MonoBehaviour
 
     public void DidReceivePlayerJoinedPackage(PlayerJoinedPackage package) 
     {
-        Game oldGameState = _game; //save current state
+            //Game oldGameState = _game; //save current state
 
         // Add player to Game _game
-        _game.players.Add(package.player);
+            //_game.players.Add(package.player);
 
         // Add the received player to the dictionary
         //_game.players.Add(...);
@@ -264,8 +264,27 @@ public class GameManager : MonoBehaviour
         //webSockets.SendGameUpdatePackage(_game);
 
         //compare old and new state
-        UpdateGame(oldGameState);
+        //UpdateGame(oldGameState);
+
         
+
+
+        //if other player's id matches, dont do anything
+        foreach (Player p in _game.players)
+        {
+            if (p.id == package.player.id)
+            {
+                return;
+            }
+            
+        }
+
+        // if it does, Add player to playerlist
+        _game.players.Add(package.player);
+
+        //if it does, instantiate 
+        GameObject newPlayerGameObject = Instantiate(playerPrefab, package.player.position, Quaternion.identity);
+
     }
 
 

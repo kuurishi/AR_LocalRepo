@@ -29,24 +29,30 @@ public class GameManager : MonoBehaviour
     void Start() 
     {
 
-        // Create a Player
-        int playerId = Random.Range(0, 1000000); //assigns a random number, can happen that 2 users can have the same number, but chances are very low. still a stupid way to create an unique ID, but works for now
-        Vector3 playerPosition = new Vector3(Random.Range(0,100),0,0); // 0, 0, 0 for now.
-        _player = new Player(playerId, playerPosition.x, playerPosition.y, playerPosition.z);
-        Debug.Log("player created: " + _player.id);
+        // Establish server connection
+        webSockets.ConnectToServer(); //from the websocketsconnection script
+
 
         // Create a Game
         _game = new Game(); //empty game 
-        _game.players.Add(_player); //1 player added to the list of players
+      
+
+        // Create a Player
+        int playerId = Random.Range(0, 1000000); //assigns a random number, can happen that 2 users can have the same number, but chances are very low. still a stupid way to create an unique ID, but works for now
+        Vector3 playerPosition = new Vector3(Random.Range(0, 100), 0, 0); // 0, 0, 0 for now.
+        _player = new Player(playerId, playerPosition.x, playerPosition.y, playerPosition.z);
+        Debug.Log("player created: " + _player.id);
+
 
         // Instantiate the Player's GameObject
         GameObject playerGameObject = Instantiate(playerPrefab, _player.position, Quaternion.identity);
 
-        // Store GameObject reference in dictionary
-        //_playerGameObjects.Add(_player.id, playerGameObject);
 
-        // Establish server connection
-        webSockets.ConnectToServer(); //from the websocketsconnection script
+        // Store GameObject reference in dictionary
+        _playerGameObjects.Add(_player.id, playerGameObject); //if we dont comment this line out, the 1st player disappears.
+
+
+        _game.players.Add(_player); //1 player added to the list of players //put back in createagame
 
     }
 
@@ -67,6 +73,7 @@ public class GameManager : MonoBehaviour
     ////////////////////////
     // User Input Events
     ////////////////////////
+
 
     public void DidReceiveMoveInput(Vector3 newPosition) 
     {
@@ -144,7 +151,7 @@ public class GameManager : MonoBehaviour
         {
             GameObject newPlayerGameObject = Instantiate(playerPrefab, newPlayer.position, Quaternion.identity);
             _playerGameObjects.Add(newPlayer.id, newPlayerGameObject);
-            _game.players.Add(newPlayer);
+            //_game.players.Add(newPlayer); //already being added at around 211 didreceivedjoinpackage
 
             Debug.Log("new player joined: " + newPlayer.id);
         }
@@ -205,9 +212,15 @@ public class GameManager : MonoBehaviour
     {
         // Add player to Game _game
         _game.players.Add(package.player);
-        
+
+        // Add the received player to the dictionary
+        //_game.players.Add(...);
+
         // Send out a GameUpdate package with updated _game
         webSockets.SendGameUpdatePackage(_game);
+
+        //resend your own player data to the newly joined players
+        webSockets.SendPlayerJoinedPackage(_player);
     }
 
 

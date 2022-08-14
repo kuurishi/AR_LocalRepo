@@ -23,15 +23,17 @@ public class WebSocketsConnection : MonoBehaviour
 
   void Start()
   {
-    //subscribes to the OnEvents, but doesn't connect yet. the connection opens 
-    webSocket = new WebSocket(serverUrl);
+        //subscribes to the OnEvents, but doesn't connect yet. the connection opens 
+        webSocket = new WebSocket(serverUrl);
 
-    webSocket.OnOpen += OnOpen;
-    webSocket.OnMessage += OnMessage;
-    webSocket.OnClose += OnClose;
-    webSocket.OnError += OnError;
+        webSocket.OnOpen += OnOpen;
+        webSocket.OnMessage += OnMessage;
+        webSocket.OnClose += OnClose;
+        webSocket.OnError += OnError;
 
   }
+
+
 
   void Update()
   {
@@ -56,7 +58,7 @@ public class WebSocketsConnection : MonoBehaviour
   private void OnMessage(byte[] inboundBytes) 
   { 
 
-    print("Message received");
+    print("Message received"); //too vague
     string inboundString = System.Text.Encoding.UTF8.GetString(inboundBytes);
     
     //checks if its a string or just an integer number. if it is just an integer, then its an error from the server (errors not implemented here. as soon as you have an error, use a diff number for diff errors. send this error code back when it occurs.)

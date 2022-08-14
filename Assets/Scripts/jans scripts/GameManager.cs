@@ -304,12 +304,13 @@ public class GameManager : MonoBehaviour
             if(entry.Key == playerID)
             {
                 Destroy(entry.Value);
-                _playerGameObjects.Remove(playerID);
+                
             }
 
-
         }        
-        
+        _playerGameObjects.Remove(playerID);
+
+
         // Remove player from Game _game
         _game.players.RemoveAll(player => player.id == package.player.id);
         

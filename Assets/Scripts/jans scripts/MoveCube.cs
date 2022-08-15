@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[Serializable]
 public class MoveCube : MonoBehaviour
 {
+
+    private Vector3 _lastPos;
+
     private void Start()
     {
         GameManager.Instance.moveCube = this;
@@ -15,8 +17,7 @@ public class MoveCube : MonoBehaviour
 
     void Update()
     {
-        //GameManager.Instance._player.id = 
-
+        
         
 
         if (GameManager.Instance.IsMyId(this.gameObject))
@@ -32,9 +33,17 @@ public class MoveCube : MonoBehaviour
             if (Input.GetKey(KeyCode.S))
                 rb.AddForce(Vector3.down);
 
-            GameManager.Instance.DidReceiveMoveInput(this.gameObject.transform.position);
+            if (!(this.transform.position == _lastPos)) //if theyre not the same
+            {
+                //update pos
+                GameManager.Instance.DidReceiveMoveInput(this.gameObject.transform.position);
+                _lastPos = this.transform.position;
+            }
+            //if its the same pos, dont do anything
+            
+           
         }
-
+        
 
        
     }

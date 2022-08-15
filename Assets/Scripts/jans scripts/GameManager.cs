@@ -85,6 +85,7 @@ public class GameManager : MonoBehaviour
 
         // Send a PlayerMovedPackage
         webSockets.SendPlayerMovedPackage(_player);
+
     }
 
 
@@ -310,9 +311,10 @@ public class GameManager : MonoBehaviour
 
     public void DidReceivePlayerMovedPackage(PlayerMovedPackage package) 
     {
+        UpdatePlayerPosition(package.player);
 
+        /*
         //check if its your id. if not, disable the move script
-
         int playerID = package.player.id;
 
         //find the object that needs to be deleted and delete and remove it from the dictionary
@@ -320,7 +322,7 @@ public class GameManager : MonoBehaviour
         {
             if (entry.Key == playerID)
             {
-                UpdatePlayerPosition(package.player);
+                
 
             }
             else
@@ -329,19 +331,8 @@ public class GameManager : MonoBehaviour
             }
 
         }
+        */
 
-
-
-
-
-
-        //find the object that needs to be deleted and delete and remove it from the dictionary
-        foreach (var entry in _playerGameObjects)
-        {
-            
-           
-        }
-     
         //resending to all other clients
         webSockets.SendPlayerMovedPackage(_player);
 

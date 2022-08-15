@@ -12,11 +12,11 @@ public class GameManager : MonoBehaviour
 
     }
 
-
+    public MoveCube moveCube;
     public WebSocketsConnection webSockets;
     public GameObject playerPrefab;
 
-    private Player _player; //who owns the device
+    public Player _player; //who owns the device
     private Game _game; //current game, all the game data
     private Dictionary<int, GameObject> _playerGameObjects = new Dictionary<int, GameObject>();  //52, 82
 
@@ -77,9 +77,11 @@ public class GameManager : MonoBehaviour
 
     public void DidReceiveMoveInput(Vector3 newPosition) 
     {
+
         // Update the player's position based on input
         _player.position = newPosition;
         _playerGameObjects[_player.id].transform.position = newPosition;
+        //Debug.Log("player moved");
 
         // Send a PlayerMovedPackage
         webSockets.SendPlayerMovedPackage(_player);
@@ -215,6 +217,7 @@ public class GameManager : MonoBehaviour
     {
         // Update player's position
         _playerGameObjects[player.id].transform.position = player.position;
+
     }
 
 
@@ -252,23 +255,7 @@ public class GameManager : MonoBehaviour
 
     public void DidReceivePlayerJoinedPackage(PlayerJoinedPackage package) 
     {
-            //Game oldGameState = _game; //save current state
-
-        // Add player to Game _game
-            //_game.players.Add(package.player);
-
-        // Add the received player to the dictionary
-        //_game.players.Add(...);
-
-        // Send out a GameUpdate package with updated _game
-        //webSockets.SendGameUpdatePackage(_game);
-
-        //compare old and new state
-        //UpdateGame(oldGameState);
-
         
-
-
         //if other player's id matches, dont do anything
         foreach (Player p in _game.players)
         {
@@ -279,7 +266,7 @@ public class GameManager : MonoBehaviour
 
         }
 
-        // if it does, Add player to playerlist
+        // if it doesnt match, Add player to playerlist
         _game.players.Add(package.player);
 
         //if it does, instantiate 
@@ -323,7 +310,42 @@ public class GameManager : MonoBehaviour
 
     public void DidReceivePlayerMovedPackage(PlayerMovedPackage package) 
     {
-        UpdatePlayerPosition(package.player);
+
+        //check if its your id. if not, disable the move script
+
+        int playerID = package.player.id;
+
+        //find the object that needs to be deleted and delete and remove it from the dictionary
+        foreach (var entry in _playerGameObjects)
+        {
+            if (entry.Key == playerID)
+            {
+                UpdatePlayerPosition(package.player);
+
+            }
+            else
+            {
+                
+            }
+
+        }
+
+
+
+
+
+
+        //find the object that needs to be deleted and delete and remove it from the dictionary
+        foreach (var entry in _playerGameObjects)
+        {
+            
+           
+        }
+     
+        //resending to all other clients
+        webSockets.SendPlayerMovedPackage(_player);
+
+
     }
 
 
@@ -333,5 +355,15 @@ public class GameManager : MonoBehaviour
     }
 
 
-
+    public bool IsMyId(GameObject gameobject)
+    {
+        if (_playerGameObjects[_player.id] == gameobject)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

@@ -10,7 +10,8 @@ public class PlayerMovedPackage
 
     public Player player;
 
-    public PlayerMovedPackage(Player player) {
+    public PlayerMovedPackage(Player player) 
+    {
         this.player = player;
     }
 
